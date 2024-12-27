@@ -1,13 +1,14 @@
 {
   inputs,
   cell,
-}: {
+}:
+{
   git = {
     programs.git = {
       enable = true;
 
-      userName = "yoseio";
-      userEmail = "98276492+yoseio@users.noreply.github.com";
+      userName = "Hina524";
+      userEmail = "132186412+Hina524@users.noreply.github.com";
 
       aliases = {
         soft = "reset --soft";
@@ -36,10 +37,30 @@
       syntaxHighlighting.enable = true;
       enableVteIntegration = true;
       dotDir = ".config/zsh";
+      shellAliases = {
+        ls = "lsd";
+      };
+
     };
 
+    # LSD config
+    programs.lsd = {
+      enable = true;
+    };
+
+    # starship config
     programs.starship = {
       enable = true;
+      settings = {
+        status = {
+          disabled = false;
+        };
+        time = {
+          disabled = false;
+          utc_time_offset = "+9";
+          time_format = "%Y-%m-%d %H:%M";
+        };
+      };
     };
 
     programs.eza = {
@@ -55,6 +76,15 @@
       nix-direnv = {
         enable = true;
       };
+      enableBashIntegration = true;
     };
   };
+
+  vscode =
+    { pkgs, ... }:
+    {
+      home.packages = with pkgs; [
+        vscode
+      ];
+    };
 }
