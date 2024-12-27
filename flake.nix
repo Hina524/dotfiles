@@ -1,5 +1,5 @@
 {
-  description = "nix-dotfiles-template";
+  description = "hina-nix-profile";
 
   nixConfig = {
     extra-experimental-features = "nix-command flakes";

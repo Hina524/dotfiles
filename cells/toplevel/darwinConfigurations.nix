@@ -15,19 +15,23 @@
       inputs.cells.core.darwinProfiles.optimize
     ];
 
-    home-manager.users.yoseio = {
+    home-manager.users.hina = {
       imports = [
         inputs.cells.core.homeProfiles.default
 
         inputs.cells.dev.homeProfiles.git
         inputs.cells.dev.homeProfiles.zsh
+        inputs.cells.dev.homeProfiles.vscode
+
+        inputs.cells.hina.homeProfiles.default
+        inputs.cells.hina.darwinProfiles.default
       ];
     };
 
     users.users = {
-      yoseio = {
+      hina = {
         createHome = true;
-        home = "/Users/yoseio";
+        home = "/Users/hina";
         shell = inputs.nixpkgs.pkgs.zsh;
       };
     };
