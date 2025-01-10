@@ -88,11 +88,19 @@
       ];
     };
 
-  xcode =
+  /* ruby =
     { pkgs, ... }:
     {
       home.packages = with pkgs; [
-        xcodes
+        ruby_3_4
+      ];
+    }; */
+
+  build_tools =
+    { pkgs, ... }:
+    {
+      home.packages = with pkgs; [
+        pkg-config
       ];
     };
 }

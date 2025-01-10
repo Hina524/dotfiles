@@ -1,20 +1,33 @@
 {
   inputs,
   cell,
-}: {
+}:
+{
   default = {
     system.stateVersion = 5;
 
     nix.settings.sandbox = true;
-    nix.settings.trusted-users = ["@admin"];
-    nix.settings.allowed-users = ["@admin"];
+    nix.settings.trusted-users = [ "@admin" ];
+    nix.settings.allowed-users = [ "@admin" ];
     nix.extraOptions = ''
       experimental-features = nix-command flakes
     '';
 
     nix.useDaemon = true;
     security.pam.enableSudoTouchIdAuth = true;
-    homebrew.enable = true;
+    homebrew = {
+      enable = true;
+      onActivation = {
+        autoUpdate = true;
+      };
+      brews = [
+        "swiftlint"
+        "xcodegen"
+        "fastlane"
+        "go"
+        "rbenv"
+      ];
+    };
   };
 
   optimize = {

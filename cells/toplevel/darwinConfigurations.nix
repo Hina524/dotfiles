@@ -22,7 +22,9 @@
         inputs.cells.dev.homeProfiles.git
         inputs.cells.dev.homeProfiles.zsh
         inputs.cells.dev.homeProfiles.vscode
-        inputs.cells.dev.homeProfiles.xcode
+        # inputs.cells.dev.homeProfiles.ruby
+        inputs.cells.dev.homeProfiles.build_tools
+        inputs.cells.dev.darwinProfiles.xcode
 
         inputs.cells.hina.homeProfiles.default
         inputs.cells.hina.darwinProfiles.default
