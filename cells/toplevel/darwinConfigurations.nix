@@ -21,6 +21,7 @@
 
         inputs.cells.dev.homeProfiles.git
         inputs.cells.dev.homeProfiles.zsh
+        inputs.cells.dev.homeProfiles.jdk23
         inputs.cells.dev.homeProfiles.vscode
         # inputs.cells.dev.homeProfiles.ruby
         inputs.cells.dev.homeProfiles.build_tools

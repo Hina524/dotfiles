@@ -80,6 +80,14 @@
     };
   };
 
+  jdk23 =
+    { pkgs, ... }:
+    {
+      home.packages = with pkgs; [
+        jdk23
+      ];
+    };
+
   vscode =
     { pkgs, ... }:
     {
