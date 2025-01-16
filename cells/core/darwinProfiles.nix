@@ -26,6 +26,7 @@
         "fastlane"
         "go"
         "rbenv"
+        "ktlint"
       ];
     };
   };
