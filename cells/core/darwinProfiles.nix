@@ -13,8 +13,8 @@
       experimental-features = nix-command flakes
     '';
 
-    nix.useDaemon = true;
-    security.pam.enableSudoTouchIdAuth = true;
+    # nix.useDaemon = true;
+    security.pam.services.sudo_local.touchIdAuth = true;
     homebrew = {
       enable = true;
       onActivation = {
@@ -27,6 +27,9 @@
         "go"
         "rbenv"
         "ktlint"
+      ];
+      casks = [
+        "figma"
       ];
     };
   };
