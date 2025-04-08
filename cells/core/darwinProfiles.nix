@@ -30,6 +30,7 @@
       ];
       casks = [
         "figma"
+        "xquartz"
       ];
     };
   };
