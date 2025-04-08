@@ -31,6 +31,7 @@
       casks = [
         "figma"
         "xquartz"
+        "astah-professional"
       ];
     };
   };
