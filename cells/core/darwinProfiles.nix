@@ -19,6 +19,8 @@
       enable = true;
       onActivation = {
         autoUpdate = true;
+        upgrade = true;
+        cleanup = "zap";
       };
       brews = [
         "swiftlint"
@@ -32,6 +34,7 @@
         "figma"
         "xquartz"
         "astah-professional"
+        "sf-symbols"
       ];
     };
   };
