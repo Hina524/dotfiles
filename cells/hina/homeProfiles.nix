@@ -12,6 +12,7 @@
       discord
       slack
       obsidian
+      google-chrome
     ];
 
     fonts.fontconfig.enable = true;
