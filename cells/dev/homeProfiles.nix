@@ -38,7 +38,6 @@
       enableVteIntegration = true;
       dotDir = ".config/zsh";
       shellAliases = {
-        ls = "lsd";
       };
 
     };
@@ -96,13 +95,13 @@
       ];
     };
 
-  /* ruby =
+  gemini-cli =
     { pkgs, ... }:
     {
       home.packages = with pkgs; [
-        ruby_3_4
+        gemini-cli
       ];
-    }; */
+    };
 
   build_tools =
     { pkgs, ... }:

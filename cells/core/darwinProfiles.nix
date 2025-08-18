@@ -6,6 +6,8 @@
   default = {
     system.stateVersion = 5;
 
+    system.primaryUser = "hina";
+
     nix.settings.sandbox = true;
     nix.settings.trusted-users = [ "@admin" ];
     nix.settings.allowed-users = [ "@admin" ];
