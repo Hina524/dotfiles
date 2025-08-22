@@ -110,4 +110,12 @@
         pkg-config
       ];
     };
+
+    claude-code =
+      { pkgs, ... }:
+      {
+        home.packages = with pkgs; [
+          claude-code
+        ];
+      };
 }
