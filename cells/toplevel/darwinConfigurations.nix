@@ -25,6 +25,7 @@
         inputs.cells.dev.homeProfiles.vscode
         inputs.cells.dev.homeProfiles.gemini-cli
         inputs.cells.dev.homeProfiles.build_tools
+        inputs.cells.dev.homeProfiles.claude-code
         inputs.cells.dev.darwinProfiles.xcode
 
         inputs.cells.hina.homeProfiles.default
