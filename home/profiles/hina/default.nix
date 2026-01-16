@@ -26,9 +26,10 @@
     google-chrome
 
     # Development
-    jdk23
+    jdk21
     gemini-cli
     pkg-config
     xcodes
+    claude-code
   ];
 }
