@@ -18,22 +18,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    devshell = {
-      url = "github:numtide/devshell";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    std = {
-      url = "github:divnix/std";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.devshell.follows = "devshell";
-    };
-
-    hive = {
-      url = "github:divnix/hive";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -43,43 +27,31 @@
   outputs = {
     self,
     nixpkgs,
-    std,
-    hive,
+    nix-darwin,
+    home-manager,
     ...
-  } @ inputs:
-    std.growOn {
-      inherit inputs;
-
-      nixpkgsConfig = {
-        allowUnfree = true;
-      };
-
-      systems = [
-        "x86_64-linux"
-        "aarch64-linux"
-        "x86_64-darwin"
-        "aarch64-darwin"
+  } @ inputs: let
+    systems = [ "x86_64-darwin" "aarch64-darwin" ];
+    forAllSystems = nixpkgs.lib.genAttrs systems;
+  in {
+    darwinConfigurations.macOS = nix-darwin.lib.darwinSystem {
+      system = "aarch64-darwin";
+      specialArgs = { inherit inputs; };
+      modules = [
+        ./systems/darwin/configurations/macOS
+        home-manager.darwinModules.home-manager
+        {
+          nixpkgs.config.allowUnfree = true;
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users.hina = import ./home/profiles/hina;
+        }
       ];
-
-      cellsFrom = ./cells;
-
-      cellBlocks = with std.blockTypes;
-      with hive.blockTypes; [
-        (functions "nixosProfiles")
-        (functions "darwinProfiles")
-        (functions "homeProfiles")
-
-        nixosConfigurations
-        darwinConfigurations
-
-        (devshells "shells")
-      ];
-    }
-    {
-      nixosConfigurations = hive.collect self "nixosConfigurations";
-      darwinConfigurations = hive.collect self "darwinConfigurations";
-    }
-    {
-      devShells = hive.harvest self ["repo" "shells"];
     };
+
+    devShells = forAllSystems (system:
+      let pkgs = nixpkgs.legacyPackages.${system};
+      in { default = import ./devshell { inherit pkgs; }; }
+    );
+  };
 }
