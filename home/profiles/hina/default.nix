@@ -16,7 +16,7 @@
     # Nix tools
     nil
     nixd
-    nixfmt-rfc-style
+    nixfmt
 
     # Applications
     warp-terminal

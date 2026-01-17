@@ -24,34 +24,49 @@
     };
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    nix-darwin,
-    home-manager,
-    ...
-  } @ inputs: let
-    systems = [ "x86_64-darwin" "aarch64-darwin" ];
-    forAllSystems = nixpkgs.lib.genAttrs systems;
-  in {
-    darwinConfigurations.macOS = nix-darwin.lib.darwinSystem {
-      system = "aarch64-darwin";
-      specialArgs = { inherit inputs; };
-      modules = [
-        ./systems/darwin/configurations/macOS
-        home-manager.darwinModules.home-manager
-        {
-          nixpkgs.config.allowUnfree = true;
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.hina = import ./home/profiles/hina;
-        }
+  outputs =
+    {
+      self,
+      nixpkgs,
+      nix-darwin,
+      home-manager,
+      ...
+    }@inputs:
+    let
+      sharedConfig = import ./shared/config.nix;
+      systems = [
+        "x86_64-darwin"
+        "aarch64-darwin"
       ];
-    };
+      forAllSystems = nixpkgs.lib.genAttrs systems;
+    in
+    {
+      darwinConfigurations.${sharedConfig.hostname} = nix-darwin.lib.darwinSystem {
+        system = sharedConfig.system;
+        specialArgs = { inherit inputs sharedConfig; };
+        modules = [
+          ./systems/darwin/configurations/macOS
+          home-manager.darwinModules.home-manager
+          {
+            nixpkgs.config.allowUnfree = true;
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = { inherit sharedConfig; };
+            home-manager.users.${sharedConfig.username} = import ./home/profiles/hina;
+          }
+        ];
+      };
 
-    devShells = forAllSystems (system:
-      let pkgs = nixpkgs.legacyPackages.${system};
-      in { default = import ./devshell { inherit pkgs; }; }
-    );
-  };
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          default = import ./devshell { inherit pkgs sharedConfig; };
+        }
+      );
+
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
+    };
 }

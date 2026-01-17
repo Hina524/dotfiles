@@ -1,17 +1,23 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  sharedConfig,
+  ...
+}:
 {
   imports = [
     ../../modules
   ];
 
   system.stateVersion = 5;
-  system.primaryUser = "hina";
+  system.primaryUser = sharedConfig.username;
 
   security.pam.services.sudo_local.touchIdAuth = true;
 
-  users.users.hina = {
+  users.users.${sharedConfig.username} = {
     createHome = true;
-    home = "/Users/hina";
+    home = sharedConfig.homeDirectory;
     shell = pkgs.zsh;
   };
 }
