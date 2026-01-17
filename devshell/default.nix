@@ -1,6 +1,6 @@
-{ pkgs }:
+{ pkgs, sharedConfig }:
 pkgs.mkShell {
-  name = "hina-nix-profile";
+  name = "${sharedConfig.username}-nix-profile";
 
   packages = with pkgs; [
     alejandra

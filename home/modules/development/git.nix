@@ -1,12 +1,17 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  sharedConfig,
+  ...
+}:
 {
   programs.git = {
     enable = true;
 
     settings = {
       user = {
-        name = "Hina524";
-        email = "132186412+Hina524@users.noreply.github.com";
+        name = sharedConfig.git.name;
+        email = sharedConfig.git.email;
       };
 
       alias = {
