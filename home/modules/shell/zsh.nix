@@ -8,6 +8,7 @@
     enableVteIntegration = true;
     dotDir = "${config.xdg.configHome}/zsh";
     shellAliases = {
+      rebuild = "sudo darwin-rebuild switch --flake ~/dotfiles#macOS";
     };
   };
 
