@@ -16,11 +16,15 @@
       "ktlint"
     ];
     casks = [
+      "discord"
       "figma"
+      "google-chrome"
+      "obsidian"
+      "sf-symbols"
+      "slack"
+      "visual-studio-code"
       "warp"
       "xquartz"
-      "astah-professional"
-      "sf-symbols"
     ];
   };
 }
