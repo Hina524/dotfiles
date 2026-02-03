@@ -2,6 +2,11 @@
 {
   system.defaults = {
     NSGlobalDomain.AppleInterfaceStyle = "Dark";
+    CustomUserPreferences = {
+      "com.apple.inputmethod.Kotoeri" = {
+        JIMPrefLiveConversionKey = false;
+      };
+    };
   };
 
   system.activationScripts.postActivation.text = ''
