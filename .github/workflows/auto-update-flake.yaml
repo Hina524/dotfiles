@@ -1,0 +1,44 @@
+name: Auto Update Flake
+
+on:
+  schedule:
+    - cron: "0 2 * * *" # 毎日11時(JST)に実行
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Update flake
+        run: nix flake update
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet flake.lock; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        if: steps.changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          commit-message: "chore: update flake.lock"
+          title: "chore: update flake.lock"
+          branch: auto-update-flake-lock
+          base: main
+
+      - name: Auto merge
+        if: steps.changes.outputs.changed == 'true'
+        run: gh pr merge auto-update-flake-lock --squash --auto
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
