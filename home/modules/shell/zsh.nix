@@ -14,6 +14,9 @@
   programs.starship = {
     enable = true;
     settings = {
+      gcloud = {
+        disabled = true;
+      };
       status = {
         disabled = false;
       };
