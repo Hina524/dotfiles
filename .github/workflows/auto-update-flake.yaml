@@ -18,6 +18,9 @@ jobs:
       - name: Update flake
         run: nix flake update
 
+      - name: Build check
+        run: nix build .#darwinConfigurations.macOS.system --dry-run
+
       - name: Check for changes
         id: changes
         run: |
