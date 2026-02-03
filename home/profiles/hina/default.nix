@@ -19,7 +19,6 @@
     nixfmt
 
     # Applications
-    warp-terminal
     discord
     slack
     obsidian
