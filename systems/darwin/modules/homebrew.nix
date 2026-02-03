@@ -17,6 +17,7 @@
     ];
     casks = [
       "figma"
+      "warp"
       "xquartz"
       "astah-professional"
       "sf-symbols"
