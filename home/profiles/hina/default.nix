@@ -18,11 +18,6 @@
     nixd
     nixfmt
 
-    # Applications
-    discord
-    slack
-    obsidian
-    google-chrome
 
     # Development
     jdk21
