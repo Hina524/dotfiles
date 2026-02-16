@@ -30,6 +30,12 @@ jobs:
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
+      - name: Delete existing branch
+        if: steps.changes.outputs.changed == 'true'
+        run: git push origin --delete auto-update-flake-lock || true
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+
       - name: Create Pull Request
         if: steps.changes.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
@@ -42,6 +48,6 @@ jobs:
 
       - name: Auto merge
         if: steps.changes.outputs.changed == 'true'
-        run: gh pr merge auto-update-flake-lock --squash --auto
+        run: gh pr merge auto-update-flake-lock --squash --delete-branch
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
