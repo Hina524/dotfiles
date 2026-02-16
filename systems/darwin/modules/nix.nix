@@ -3,6 +3,8 @@
   nix.settings.sandbox = true;
   nix.settings.trusted-users = [ "@admin" ];
   nix.settings.allowed-users = [ "@admin" ];
+  nix.settings.max-jobs = "auto";
+  nix.settings.cores = 0; # 全コア使用
   nix.extraOptions = ''
     experimental-features = nix-command flakes
   '';
