@@ -3,6 +3,7 @@
   imports = [
     ../../modules/shell
     ../../modules/development
+    ../../modules/ssh.nix
   ];
 
   home.stateVersion = "24.11";
