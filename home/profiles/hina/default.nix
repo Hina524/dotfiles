@@ -19,7 +19,6 @@
     nixd
     nixfmt
 
-
     # Development
     jdk21
     gemini-cli

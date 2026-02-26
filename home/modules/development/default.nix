@@ -2,6 +2,7 @@
 {
   imports = [
     ./git.nix
+    ./github.nix
     ./php.nix
     ./nodejs.nix
     ./laravel.nix
