@@ -16,8 +16,6 @@
       "ktlint"
     ];
     casks = [
-      "1password"
-      "1password-cli"
       "discord"
       "figma"
       "google-chrome"
