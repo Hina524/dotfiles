@@ -4,4 +4,4 @@
 *.log
 result
 .envrc
-.claude
+.claude/settings.local.json
