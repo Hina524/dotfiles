@@ -1,3 +1,10 @@
+/*
+  SSH 接続設定
+
+  大学サーバーへのSSH接続を管理する：
+  - sshgate.u-aizu.ac.jp: 踏み台サーバー
+  - cad: sshgate経由のProxyCommand接続
+*/
 { config, pkgs, ... }:
 {
   programs.ssh = {
