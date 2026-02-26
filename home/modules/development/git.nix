@@ -1,3 +1,12 @@
+/*
+  Git 設定
+
+  Gitのユーザー情報・エイリアス・エディタを管理する：
+  - ユーザー名とメールはshared/config.nixから取得
+  - ログ表示用エイリアス（lg, plog, tlog, rank）
+  - リセット用エイリアス（soft, hard, s1ft, h1rd）
+  - デフォルトブランチ: main、エディタ: VSCode
+*/
 {
   config,
   pkgs,

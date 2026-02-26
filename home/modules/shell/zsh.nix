@@ -1,3 +1,12 @@
+/*
+  シェル環境設定
+
+  zshとシェル補助ツールを管理する：
+  - zsh: 補完、自動サジェスト、シンタックスハイライト有効
+  - lsd/eza: ls代替コマンド
+  - bat: cat代替コマンド
+  - direnv: ディレクトリ固有の環境変数管理（nix-direnv連携）
+*/
 { config, pkgs, ... }:
 {
   programs.zsh = {

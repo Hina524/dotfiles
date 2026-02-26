@@ -1,3 +1,9 @@
+/*
+  Homebrew パッケージ管理
+
+  GUIアプリ（casks）とCLIツール（brews）をHomebrewで管理する
+  rebuild時に自動更新・アップグレード・不要パッケージの削除（zap）を行う
+*/
 { config, pkgs, ... }:
 {
   homebrew = {

@@ -1,3 +1,11 @@
+/*
+  macOS システム設定
+
+  system.defaultsとactivationScriptsでmacOSの設定を管理する：
+  - ダークモードの有効化
+  - ライブ変換の無効化
+  - 電源管理（充電中：スリープなし、バッテリー時：10分でスリープ）
+*/
 { config, pkgs, ... }:
 {
   system.defaults = {
