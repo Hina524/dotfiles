@@ -19,6 +19,9 @@ jobs:
 
       - uses: DeterminateSystems/nix-installer-action@main
 
+      - name: Save old flake.lock
+        run: cp flake.lock /tmp/flake.lock.old
+
       - name: Update flake
         run: nix flake update --option access-tokens github.com=${{ secrets.PAT_TOKEN }}
 
@@ -31,6 +34,29 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Generate PR body
+        if: steps.changes.outputs.changed == 'true'
+        id: pr-body
+        run: |
+          UPDATED=$(jq -r '.nodes | to_entries[] | select(.value.locked?) | .key' /tmp/flake.lock.old | while read -r key; do
+            old_rev=$(jq -r --arg k "$key" '.nodes[$k].locked.rev // empty' /tmp/flake.lock.old)
+            new_rev=$(jq -r --arg k "$key" '.nodes[$k].locked.rev // empty' flake.lock)
+            if [ -n "$old_rev" ] && [ -n "$new_rev" ] && [ "$old_rev" != "$new_rev" ]; then
+              echo "- $key"
+            fi
+          done)
+          TODAY=$(date -u +%Y-%m-%d)
+          {
+            echo "body<<EOF"
+            echo "### 更新されたinput"
+            echo "$UPDATED"
+            echo ""
+            echo "### 次のアクション"
+            echo "\`rebuild\` を実行して変更を適用してください"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          echo "date=$TODAY" >> "$GITHUB_OUTPUT"
+
       - name: Create Pull Request
         if: steps.changes.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
@@ -38,9 +64,8 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
           commit-message: "[auto] Update flake.lock"
-          title: "[auto] Update flake.lock"
-          body: |
-            `nix flake update` による flake.lock の自動更新
+          title: "[auto] Update flake.lock (${{ steps.pr-body.outputs.date }})"
+          body: ${{ steps.pr-body.outputs.body }}
           branch: auto/update-flake-lock
           base: main
 
