@@ -9,6 +9,7 @@
 {
   programs.ssh = {
     enable = true;
+    enableDefaultConfig = false;
     matchBlocks = {
       "sshgate.u-aizu.ac.jp" = {
         hostname = "sshgate.u-aizu.ac.jp";
