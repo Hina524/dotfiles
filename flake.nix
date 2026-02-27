@@ -35,6 +35,7 @@
     let
       sharedConfig = import ./shared/config.nix;
       systems = [
+        "x86_64-linux"
         "x86_64-darwin"
         "aarch64-darwin"
       ];
