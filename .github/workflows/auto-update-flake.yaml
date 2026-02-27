@@ -18,12 +18,9 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
 
       - uses: DeterminateSystems/nix-installer-action@main
-        with:
-          extra-conf: |
-            access-tokens = github.com=${{ secrets.PAT_TOKEN }}
 
       - name: Update flake
-        run: nix flake update
+        run: nix flake update --option access-tokens github.com=${{ secrets.PAT_TOKEN }}
 
       - name: Check for changes
         id: changes
