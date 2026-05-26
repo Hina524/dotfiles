@@ -19,7 +19,7 @@ jobs:
 
       - uses: cachix/install-nix-action@v31
         with:
-          github_access_token: ${{ secrets.PAT_TOKEN }}
+          github_access_token: ${{ github.token }}
 
       - name: Update flake
         run: nix flake update
