@@ -2,14 +2,14 @@
   Nix 本体の設定
 
   Nixのビルド・セキュリティ・ストレージ最適化を管理する：
-  - サンドボックス有効化、全コアを使った並列ビルド
+  - サンドボックス有効化（relaxedモード：__noChroot指定パッケージは許可）、全コアを使った並列ビルド
   - flakesとnix-commandの有効化
   - 自動GC（毎週日曜、30日以上古いものを削除）
   - ストアの自動最適化
 */
 { config, pkgs, ... }:
 {
-  nix.settings.sandbox = true;
+  nix.settings.sandbox = "relaxed";
   nix.settings.trusted-users = [ "@admin" ];
   nix.settings.allowed-users = [ "@admin" ];
   nix.settings.max-jobs = "auto";
