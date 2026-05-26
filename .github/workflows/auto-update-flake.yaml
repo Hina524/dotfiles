@@ -19,10 +19,7 @@ jobs:
 
       - uses: cachix/install-nix-action@v31
         with:
-          nix_path: nixpkgs=channel:nixos-unstable
-          extra_nix_config: |
-            experimental-features = nix-command flakes
-            access-tokens = github.com=${{ secrets.PAT_TOKEN }}
+          github_access_token: ${{ secrets.PAT_TOKEN }}
 
       - name: Update flake
         run: nix flake update
