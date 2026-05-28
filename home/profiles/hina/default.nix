@@ -25,5 +25,8 @@
     pkg-config
     xcodes
     claude-code
+
+    # Kubernetes
+    kind
   ];
 }
