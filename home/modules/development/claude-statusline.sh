@@ -7,7 +7,7 @@
 #   🤖 モデル名 + effort レベル
 #   📂 カレントディレクトリ名
 #   🌿 Git ブランチ（未コミット変更があれば末尾に *）
-#   🧠 コンテキスト残量 %（残量ゲージバー + 使用/上限トークン数。緑>50 / 黄20-50 / 赤<20）
+#   🧠 コンテキスト使用量 %（使用量ゲージバー + 使用/上限トークン数。緑<50 / 黄50-80 / 赤>80）
 #   💰 セッション累計コスト ($)
 #   各セグメントは │ で区切る。
 #
@@ -42,14 +42,14 @@ input=$(cat)
     .effort.level // "",
     (.workspace.current_dir // .cwd // ""),
     (.cost.total_cost_usd // 0),
-    ((.context_window.remaining_percentage // 100) | floor),
+    ((.context_window.used_percentage // 0) | floor),
     ((.context_window.total_input_tokens // 0)       | floor),
     ((.context_window.context_window_size // 200000) | floor)'
 )
 
 # 数値バリデーション（想定外の値はフォールバック）
 is_uint() { case "$1" in '' | *[!0-9]*) return 1 ;; *) return 0 ;; esac; }
-is_uint "$remain" || remain=100
+is_uint "$remain" || remain=0
 is_uint "$used" || used=0
 is_uint "$size" || size=200000
 
@@ -79,7 +79,7 @@ fmt() {
   awk -v n="$1" 'BEGIN{ if (n >= 1000000) printf "%.1fM", n/1000000; else printf "%dk", n/1000 }'
 }
 
-# ---- 残量ゲージバー（█ = 残量 / ░ = 消費。幅10）----
+# ---- 使用量ゲージバー（█ = 消費 / ░ = 残量。幅10）----
 gauge() {
   local pct=$1 width=10 filled empty i out=""
   filled=$(((pct * width + 50) / 100))
@@ -91,9 +91,9 @@ gauge() {
   printf '%s' "$out"
 }
 
-# ---- コンテキスト残量の色 ----
-if [ "$remain" -gt 50 ]; then ctxc=$green
-elif [ "$remain" -gt 20 ]; then ctxc=$yellow
+# ---- コンテキスト使用量の色（多いほど危険）----
+if [ "$remain" -lt 50 ]; then ctxc=$green
+elif [ "$remain" -lt 80 ]; then ctxc=$yellow
 else ctxc=$red; fi
 
 # ---- effort 接尾辞 ----
