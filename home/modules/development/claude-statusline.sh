@@ -3,12 +3,13 @@
 # Claude Code ステータスライン
 #
 # 機能:
-#   ターミナル下部に現在のセッション情報を1行で表示する。
-#   - モデル名 + effort レベル
-#   - カレントディレクトリ名
-#   - Git ブランチ（未コミット変更があれば末尾に *）
-#   - コンテキスト残量 %（緑>50 / 黄20-50 / 赤<20）と使用トークン数
-#   - セッション累計コスト ($)
+#   ターミナル下部に現在のセッション情報を絵文字付き1行で表示する。
+#   🤖 モデル名 + effort レベル
+#   📂 カレントディレクトリ名
+#   🌿 Git ブランチ（未コミット変更があれば末尾に *）
+#   🧠 コンテキスト残量 %（残量ゲージバー + 使用/上限トークン数。緑>50 / 黄20-50 / 赤<20）
+#   💰 セッション累計コスト ($)
+#   各セグメントは │ で区切る。
 #
 # 設定:
 #   ~/.claude/settings.json の statusLine.command からこのスクリプトを参照する。
@@ -56,7 +57,7 @@ is_uint "$size" || size=200000
 dim=$'\033[2m'; reset=$'\033[0m'
 cyan=$'\033[36m'; blue=$'\033[34m'; magenta=$'\033[35m'
 green=$'\033[32m'; yellow=$'\033[33m'; red=$'\033[31m'
-sep="${dim} · ${reset}"
+sep="${dim} │ ${reset}"
 
 # ---- ディレクトリ ----
 dir=$(basename "$cwd")
@@ -70,12 +71,24 @@ if [ -n "$branch" ]; then
     || ! git -C "$cwd" diff --cached --quiet --ignore-submodules 2>/dev/null; then
     dirty="*"
   fi
-  git_seg="${magenta}${branch}${dirty}${reset}${sep}"
+  git_seg="🌿 ${magenta}${branch}${dirty}${reset}${sep}"
 fi
 
 # ---- トークン整形（k / M）: awk へは -v で変数渡し ----
 fmt() {
   awk -v n="$1" 'BEGIN{ if (n >= 1000000) printf "%.1fM", n/1000000; else printf "%dk", n/1000 }'
+}
+
+# ---- 残量ゲージバー（█ = 残量 / ░ = 消費。幅10）----
+gauge() {
+  local pct=$1 width=10 filled empty i out=""
+  filled=$(((pct * width + 50) / 100))
+  [ "$filled" -gt "$width" ] && filled=$width
+  [ "$filled" -lt 0 ] && filled=0
+  empty=$((width - filled))
+  for ((i = 0; i < filled; i++)); do out="${out}█"; done
+  for ((i = 0; i < empty; i++)); do out="${out}░"; done
+  printf '%s' "$out"
 }
 
 # ---- コンテキスト残量の色 ----
@@ -90,11 +103,12 @@ effort_seg=""
 # ---- コスト整形: awk へは -v で変数渡し ----
 cost_fmt=$(awk -v c="$cost" 'BEGIN{ printf "%.2f", (c + 0) }')
 
-ctx_seg="ctx ${ctxc}${remain}%${reset} ${dim}($(fmt "$used")/$(fmt "$size"))${reset}"
+# ---- コンテキストセグメント（絵文字 + % + ゲージ + トークン数）----
+ctx_seg="🧠 ${ctxc}${remain}% ▕$(gauge "$remain")▏${reset} ${dim}$(fmt "$used")/$(fmt "$size")${reset}"
 
-line="${cyan}${model}${reset}${effort_seg}${sep}"
-line="${line}${blue}${dir}${reset}${sep}"
+line="🤖 ${cyan}${model}${reset}${effort_seg}${sep}"
+line="${line}📂 ${blue}${dir}${reset}${sep}"
 line="${line}${git_seg}"
 line="${line}${ctx_seg}${sep}"
-line="${line}${dim}\$${cost_fmt}${reset}"
+line="${line}💰 ${dim}\$${cost_fmt}${reset}"
 printf '%s\n' "$line"
