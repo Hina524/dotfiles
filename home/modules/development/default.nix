@@ -9,5 +9,6 @@
     ./ngrok.nix
     ./gcloud.nix
     ./terraform.nix
+    ./claude-code.nix
   ];
 }
