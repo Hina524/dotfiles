@@ -27,5 +27,8 @@
 
     # Kubernetes
     kind
+
+    # PDF
+    poppler-utils
   ];
 }
