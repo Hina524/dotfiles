@@ -9,6 +9,7 @@
 #   🌿 Git ブランチ（未コミット変更があれば末尾に *）
 #   🧠 コンテキスト使用量 %（使用量ゲージバー + 使用/上限トークン数。緑<50 / 黄50-80 / 赤>80）
 #   💰 セッション累計コスト ($)
+#   ⏱ レート制限使用率 5h / 7d（Claude.ai Pro/Max のみ。absent の場合は非表示）
 #   各セグメントは │ で区切る。
 #
 # 設定:
@@ -36,6 +37,8 @@ input=$(cat)
   IFS= read -r remain
   IFS= read -r used
   IFS= read -r size
+  IFS= read -r rate_5h
+  IFS= read -r rate_7d
 } < <(
   printf '%s' "$input" | /usr/bin/jq -r '
     .model.display_name // "?",
@@ -44,7 +47,9 @@ input=$(cat)
     (.cost.total_cost_usd // 0),
     ((.context_window.used_percentage // 0) | floor),
     ((.context_window.total_input_tokens // 0)       | floor),
-    ((.context_window.context_window_size // 200000) | floor)'
+    ((.context_window.context_window_size // 200000) | floor),
+    (if .rate_limits.five_hour then (.rate_limits.five_hour.used_percentage | floor | tostring) else "" end),
+    (if .rate_limits.seven_day  then (.rate_limits.seven_day.used_percentage  | floor | tostring) else "" end)'
 )
 
 # 数値バリデーション（想定外の値はフォールバック）
@@ -106,9 +111,25 @@ cost_fmt=$(awk -v c="$cost" 'BEGIN{ printf "%.2f", (c + 0) }')
 # ---- コンテキストセグメント（絵文字 + % + ゲージ + トークン数）----
 ctx_seg="🧠 ${ctxc}${remain}% ▕$(gauge "$remain")▏${reset} ${dim}$(fmt "$used")/$(fmt "$size")${reset}"
 
+# ---- レート制限セグメント（Pro/Max のみ表示）----
+rate_color() {
+  local p=$1
+  if [ "$p" -lt 70 ]; then printf '%s' "$green"
+  elif [ "$p" -lt 90 ]; then printf '%s' "$yellow"
+  else printf '%s' "$red"; fi
+}
+rate_seg=""
+if [ -n "$rate_5h" ] || [ -n "$rate_7d" ]; then
+  rate_seg="⏱ "
+  [ -n "$rate_5h" ] && rate_seg="${rate_seg}$(rate_color "$rate_5h")5h:${rate_5h}%${reset}"
+  [ -n "$rate_5h" ] && [ -n "$rate_7d" ] && rate_seg="${rate_seg}${dim} ${reset}"
+  [ -n "$rate_7d" ] && rate_seg="${rate_seg}$(rate_color "$rate_7d")7d:${rate_7d}%${reset}"
+fi
+
 line="🤖 ${cyan}${model}${reset}${effort_seg}${sep}"
 line="${line}📂 ${blue}${dir}${reset}${sep}"
 line="${line}${git_seg}"
 line="${line}${ctx_seg}${sep}"
 line="${line}💰 ${dim}\$${cost_fmt}${reset}"
+[ -n "$rate_seg" ] && line="${line}${sep}${rate_seg}"
 printf '%s\n' "$line"
