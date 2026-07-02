@@ -3,7 +3,7 @@
 # Claude Code ステータスライン
 #
 # 機能:
-#   ターミナル下部に現在のセッション情報を絵文字付き1行で表示する。
+#   ターミナル下部に現在のセッション情報を絵文字付き2段で表示する。
 #   🤖 モデル名 + effort レベル
 #   📂 カレントディレクトリ名
 #   🌿 Git ブランチ（未コミット変更があれば末尾に *）
@@ -68,15 +68,13 @@ sep="${dim} │ ${reset}"
 dir=$(basename "$cwd")
 
 # ---- Git ブランチ + dirty ----
-git_seg=""
 branch=$(git -C "$cwd" symbolic-ref --short HEAD 2>/dev/null || true)
+dirty=""
 if [ -n "$branch" ]; then
-  dirty=""
   if ! git -C "$cwd" diff --quiet --ignore-submodules 2>/dev/null \
     || ! git -C "$cwd" diff --cached --quiet --ignore-submodules 2>/dev/null; then
     dirty="*"
   fi
-  git_seg="🌿 ${magenta}${branch}${dirty}${reset}${sep}"
 fi
 
 # ---- トークン整形（k / M）: awk へは -v で変数渡し ----
@@ -126,10 +124,10 @@ if [ -n "$rate_5h" ] || [ -n "$rate_7d" ]; then
   [ -n "$rate_7d" ] && rate_seg="${rate_seg}$(rate_color "$rate_7d")7d:${rate_7d}%${reset}"
 fi
 
-line="🤖 ${cyan}${model}${reset}${effort_seg}${sep}"
-line="${line}📂 ${blue}${dir}${reset}${sep}"
-line="${line}${git_seg}"
-line="${line}${ctx_seg}${sep}"
-line="${line}💰 ${dim}\$${cost_fmt}${reset}"
-[ -n "$rate_seg" ] && line="${line}${sep}${rate_seg}"
-printf '%s\n' "$line"
+line1="🤖 ${cyan}${model}${reset}${effort_seg}${sep}"
+line1="${line1}📂 ${blue}${dir}${reset}"
+[ -n "$branch" ] && line1="${line1}${sep}🌿 ${magenta}${branch}${dirty}${reset}"
+line2="${ctx_seg}${sep}"
+line2="${line2}💰 ${dim}\$${cost_fmt}${reset}"
+[ -n "$rate_seg" ] && line2="${line2}${sep}${rate_seg}"
+printf '%s\n%s\n' "$line1" "$line2"
