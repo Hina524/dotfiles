@@ -38,5 +38,11 @@
       init.defaultBranch = "main";
       core.editor = "code --wait";
     };
+
+    # 全プロジェクト共通の無視設定（~/.config/git/ignore に出力される）
+    ignores = [
+      "**/.claude/settings.local.json"
+      ".agent/handoff.md"
+    ];
   };
 }
