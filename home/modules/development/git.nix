@@ -1,10 +1,13 @@
 /*
   Git 設定
 
-  Gitのユーザー情報・エイリアス・エディタを管理する：
+  Gitのユーザー情報・エイリアス・エディタ・運用設定を管理する：
   - ユーザー名とメールはshared/config.nixから取得
-  - ログ表示用エイリアス（lg, plog, tlog, rank）
-  - リセット用エイリアス（soft, hard, s1ft, h1rd）
+  - エイリアス: undo（直前コミット取り消し）, cleanup（マージ済みブランチを削除）
+  - 運用設定:
+    - push.autoSetupRemote: 新規ブランチの初回pushで -u origin 不要
+    - fetch.prune: fetch時にリモートで消えたブランチを自動削除
+    - branch.sort: git branch を最近使った順に表示
   - デフォルトブランチ: main、エディタ: VSCode
 */
 {
@@ -24,16 +27,15 @@
       };
 
       alias = {
-        soft = "reset --soft";
-        hard = "reset --hard";
-        s1ft = "soft HEAD~1";
-        h1rd = "hard HEAD~1";
-
-        lg = "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit";
-        plog = "log --graph --pretty='format:%C(red)%d%C(reset) %C(yellow)%h%C(reset) %ar %C(green)%aN%C(reset) %s'";
-        tlog = "log --stat --since='1 Day Ago' --graph --pretty=oneline --abbrev-commit --date=relative";
-        rank = "shortlog -sn --no-merges";
+        undo = "reset --soft HEAD~1";
+        # main にマージ済みのローカルブランチを削除する（-d なので未マージは削除されず安全）。
+        # main と現在ブランチは除外する。merge commit 運用が前提。
+        cleanup = "!git branch --merged main | grep -vE '^[+*]|\\bmain\\b' | while read -r b; do git branch -d \"$b\"; done";
       };
+
+      push.autoSetupRemote = true;
+      fetch.prune = true;
+      branch.sort = "-committerdate";
 
       init.defaultBranch = "main";
       core.editor = "code --wait";
