@@ -5,3 +5,4 @@
 result
 .envrc
 .claude/settings.local.json
+.agent/handoff.md
