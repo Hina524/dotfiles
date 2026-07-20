@@ -10,6 +10,7 @@
     Skills:
       - handoff: /handoff で .agent/handoff.md に作業状態を構造化して書き出す
         （コンパクションやセッション再開に備えた手動運用の引き継ぎドキュメント）
+      - japanese-tech-writing: 日本語の記事・ノート・技術文書を AI っぽくない自然な文章で書くための規範
 
   設定:
     home.file で各ファイルを ~/.claude/ 配下に宣言的にデプロイする。
@@ -33,5 +34,9 @@
   # Skills
   home.file.".claude/skills/handoff/SKILL.md" = {
     source = ./claude-skills/handoff/SKILL.md;
+  };
+
+  home.file.".claude/skills/japanese-tech-writing/SKILL.md" = {
+    source = ./claude-skills/japanese-tech-writing/SKILL.md;
   };
 }
