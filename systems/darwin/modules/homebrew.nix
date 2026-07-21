@@ -33,6 +33,7 @@
       "obsidian"
       "sf-symbols"
       "slack"
+      "swiftbar"
       "visual-studio-code"
       "warp"
       "xquartz"
