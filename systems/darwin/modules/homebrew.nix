@@ -24,6 +24,7 @@
       "fastlane"
       "go"
       "ktlint"
+      "mpv"
     ];
     casks = [
       "discord"
