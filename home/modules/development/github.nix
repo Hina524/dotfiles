@@ -20,7 +20,7 @@
     pkgs.github-mcp-server
   ];
 
-  programs.zsh.initExtra = ''
+  programs.zsh.initContent = ''
     # github-mcp-server の認証トークンを gh CLI から動的取得
     if command -v gh &>/dev/null; then
       export GITHUB_PERSONAL_ACCESS_TOKEN="$(gh auth token 2>/dev/null)"
