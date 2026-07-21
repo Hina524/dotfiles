@@ -6,14 +6,15 @@
 #   Claude Code がツールを実行する直前に呼ばれ、機密ファイルへのアクセスを
 #   検出したらブロックする（exit 2）。auto モード運用の安全網。
 #
-# 対象ツール:
-#   Read / Write / Edit / Bash / Grep（settings.json の matcher で指定）
+# 対象ツールと判定:
+#   - Read / Write / Edit / NotebookEdit / Grep: file_path / path を検査し、
+#     機密パターンに一致したらブロック（公開鍵 .pub は許可）
+#   - Bash: command を検査するが、単に機密名を文字列として含むだけ
+#     （コミットメッセージ・PR 本文・ドキュメント等）は許可し、
+#     cat/cp/scp 等の読み出し・持ち出し系コマンドが機密ファイルを
+#     対象にした場合のみブロックする（誤爆防止）
 #
-# 判定:
-#   - ファイル系ツールは file_path / path を、Bash は command 文字列を検査する
-#   - 機密パターン（SSH 秘密鍵・credentials.json・.pem 等）に一致したらブロック
-#   - 公開鍵（.pub）は許可
-#   - .env / .envrc は direnv 運用のため意図的に許可（ブロックしない）
+#   .env / .envrc は direnv 運用のため意図的に許可（ブロックしない）。
 #
 # 設定:
 #   home.file で ~/.claude/hooks/safety-gate.sh にデプロイし、
@@ -25,26 +26,34 @@
 set -u
 input=$(cat)
 
-# 検査対象の文字列（ツールごとに見る場所が違う）
-target=$(printf '%s' "$input" | /usr/bin/jq -r '
-  .tool_input.file_path // .tool_input.path // .tool_input.command // ""
-')
+tool=$(printf '%s' "$input" | /usr/bin/jq -r '.tool_name // ""')
 
-[ -z "$target" ] && exit 0
+# 機密ファイル名のパターン
+secret='credentials\.json|\.secrets|id_(rsa|ed25519|ecdsa|dsa)|\.pem|\.p12|\.pfx|\.aws/credentials|\.netrc|secring'
 
-# 公開鍵は許可（秘密鍵パターンより先に判定）
-if printf '%s' "$target" | grep -qE '\.pub([[:space:]]|"|'"'"'|$)'; then
-  exit 0
-fi
-
-# 機密パターン
-patterns='credentials\.json|\.secrets|(^|/)id_(rsa|ed25519|ecdsa|dsa)|\.pem|\.p12|\.pfx|\.aws/credentials|(^|/)\.netrc|secring'
-
-if printf '%s' "$target" | grep -qE "$patterns"; then
+block() {
   echo "🛑 safety-gate: 機密ファイルへのアクセスをブロックしました" >&2
-  echo "   対象: $target" >&2
-  echo "   意図的な操作なら ~/.claude/hooks/safety-gate.sh のパターンを見直してください。" >&2
+  echo "   対象: $1" >&2
+  echo "   意図的な操作なら ~/.claude/hooks/safety-gate.sh を見直してください。" >&2
   exit 2
-fi
+}
+
+case "$tool" in
+  Read | Write | Edit | NotebookEdit | Grep)
+    target=$(printf '%s' "$input" | /usr/bin/jq -r '.tool_input.file_path // .tool_input.notebook_path // .tool_input.path // ""')
+    [ -z "$target" ] && exit 0
+    # 公開鍵は許可
+    printf '%s' "$target" | grep -qE '\.pub([[:space:]]|"|'"'"'|$)' && exit 0
+    printf '%s' "$target" | grep -qE "$secret" && block "$target"
+    ;;
+  Bash)
+    cmd=$(printf '%s' "$input" | /usr/bin/jq -r '.tool_input.command // ""')
+    [ -z "$cmd" ] && exit 0
+    # 読み出し・持ち出し系コマンドが機密ファイルを対象にした場合のみブロック。
+    # [^|;&]* で同一コマンドセグメント内に限定し、パイプ後の grep 等は対象外にする。
+    verbs='cat|less|more|head|tail|cp|scp|rsync|base64|xxd|strings|openssl|curl|nc'
+    printf '%s' "$cmd" | grep -qE "($verbs)[[:space:]]+[^|;&]*($secret)" && block "$cmd"
+    ;;
+esac
 
 exit 0
