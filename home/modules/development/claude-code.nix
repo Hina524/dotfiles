@@ -16,6 +16,9 @@
       - safety-gate: 機密ファイル（SSH秘密鍵・credentials.json 等）へのアクセスを
         ツール実行前にブロックする PreToolUse hook（auto モードの安全網）
 
+    Commands:
+      - postmortem: /postmortem で直近の予期しない動作の根本原因を分析し再発防止策を提案する
+
   設定:
     home.file で各ファイルを ~/.claude/ 配下に宣言的にデプロイする。
     settings.json は nix 管理しない（Claude 本体が /config 等で書き込むため）。
@@ -55,5 +58,10 @@
   home.file.".claude/hooks/safety-gate.sh" = {
     source = ./claude-hooks/safety-gate.sh;
     executable = true;
+  };
+
+  # Commands
+  home.file.".claude/commands/postmortem.md" = {
+    source = ./claude-commands/postmortem.md;
   };
 }
