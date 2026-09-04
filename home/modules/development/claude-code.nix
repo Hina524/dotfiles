@@ -11,6 +11,8 @@
       - handoff: /handoff で .agent/handoff.md に作業状態を構造化して書き出す
         （コンパクションやセッション再開に備えた手動運用の引き継ぎドキュメント）
       - japanese-tech-writing: 日本語の記事・ノート・技術文書を AI っぽくない自然な文章で書くための規範
+      - explain-back: 実装後に Claude がユーザーへ質問し、答えられない箇所を理解負債として可視化する
+        （説明する側とされる側を逆にすることで、AI に書かせたコードの理解の穴を見つける）
 
     Hooks:
       - safety-gate: 機密ファイル（SSH秘密鍵・credentials.json 等）へのアクセスを
@@ -52,6 +54,10 @@
 
   home.file.".claude/skills/japanese-tech-writing/SKILL.md" = {
     source = ./claude-skills/japanese-tech-writing/SKILL.md;
+  };
+
+  home.file.".claude/skills/explain-back/SKILL.md" = {
+    source = ./claude-skills/explain-back/SKILL.md;
   };
 
   # Hooks
