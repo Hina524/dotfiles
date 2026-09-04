@@ -4,6 +4,8 @@
   Gitのユーザー情報・エイリアス・エディタ・運用設定を管理する：
   - ユーザー名とメールはshared/config.nixから取得
   - エイリアス: undo（直前コミット取り消し）, cleanup（マージ済みブランチを削除）
+    cleanup の実体は git-cleanup-merged.sh。merge commit 運用と squash 運用の両方に対応し、
+    `git cleanup --dry-run` で削除せず対象だけ確認できる
   - 運用設定:
     - push.autoSetupRemote: 新規ブランチの初回pushで -u origin 不要
     - fetch.prune: fetch時にリモートで消えたブランチを自動削除
@@ -28,9 +30,10 @@
 
       alias = {
         undo = "reset --soft HEAD~1";
-        # main にマージ済みのローカルブランチを削除する（-d なので未マージは削除されず安全）。
-        # main と現在ブランチは除外する。merge commit 運用が前提。
-        cleanup = "!git branch --merged main | grep -vE '^[+*]|\\bmain\\b' | while read -r b; do git branch -d \"$b\"; done";
+        # マージ済みのローカルブランチを削除する。main と現在ブランチは除外する。
+        # merge commit 運用と squash 運用の両方に対応する（判定の詳細はスクリプト冒頭を参照）。
+        # 従来は `git branch --merged` のみで、squash されたブランチを検出できなかった。
+        cleanup = "!$HOME/.config/git/cleanup-merged.sh";
       };
 
       push.autoSetupRemote = true;
@@ -46,5 +49,11 @@
       "**/.claude/settings.local.json"
       ".agent/handoff.md"
     ];
+  };
+
+  # cleanup エイリアスの実体
+  home.file.".config/git/cleanup-merged.sh" = {
+    source = ./git-cleanup-merged.sh;
+    executable = true;
   };
 }
