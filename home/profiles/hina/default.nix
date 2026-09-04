@@ -20,7 +20,6 @@
 
     # Development
     jdk21
-    gemini-cli
     pkg-config
     xcodes
     claude-code
