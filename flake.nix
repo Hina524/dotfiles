@@ -68,6 +68,8 @@
         }
       );
 
-      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
+      # nixfmt は単一ファイル用のため、引数なしの `nix fmt` が stdin を読みに行って失敗する。
+      # nixfmt-tree（treefmt ラッパー）はツリー全体を対象にできる。
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
     };
 }
